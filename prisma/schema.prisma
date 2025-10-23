@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Round {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  status    RoundStatus
+  tickets   Ticket[]
+  draw      Draw?
+}
+
+model Ticket {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  roundId   String
+  round     Round    @relation(fields: [roundId], references: [id])
+  idNumber  String   @db.VarChar(20)
+  numbers   String   // comma-separated numbers (sorted)
+}
+
+model Draw {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  roundId   String   @unique
+  round     Round    @relation(fields: [roundId], references: [id])
+  numbers   String   // comma-separated numbers (sorted)
+}
+
+enum RoundStatus {
+  OPEN
+  CLOSED
+}
