@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // views
-app.set('views', path.join(process.cwd(), 'src', 'views'));
+app.set('views', path.join(__dirname, '..', 'src', 'views'));
 app.set('view engine', 'ejs');
 
 // static
