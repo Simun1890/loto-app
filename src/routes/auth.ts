@@ -10,9 +10,9 @@ const config: ConfigParams = {
     clientID: process.env.AUTH0_CLIENT_ID,
     secret: process.env.SESSION_SECRET,
     routes: {
-        login: false,          
-        callback: '/callback', 
-    },
+        login: false,
+        callback: '/callback' // 👈 ovo je KLJUČNO
+    }
 };
 
 export const oidc = auth(config);
