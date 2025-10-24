@@ -14,6 +14,7 @@ const config: ConfigParams = {
         callback: '/callback' // 👈 ovo je KLJUČNO
     }
 };
+console.log('AUTH0_CLIENT_ID:', process.env.AUTH0_CLIENT_ID);
 
 export const oidc = auth(config);
 console.log('✅ Auth0 middleware loaded with baseURL:', process.env.BASE_URL);
