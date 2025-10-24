@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { prisma } from './utils/prisma.js';
+import adminRoutes from './routes/admin.js';
 import ticketsRoutes from './routes/tickets.js';
 import { oidc } from './routes/auth.js';
 import * as openid from 'express-openid-connect';
@@ -44,6 +45,7 @@ app.get('/logout', (req, res) => {
 });
 
 // Admin (M2M-protected) endpoints
+app.use('/', adminRoutes);
 app.use('/', ticketsRoutes);
 
 // Home page
