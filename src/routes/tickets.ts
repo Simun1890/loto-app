@@ -108,40 +108,18 @@ router.get('/ticket/:id', async (req, res) => {
  * Pregled listića prijavljenog korisnika
  */
 router.get('/my-tickets', async (req, res) => {
-    try {
-        const user = (req as any).oidc?.user;
-
-        // Ako korisnik nije prijavljen — preusmjeri na login
-        if (!user) {
-            return res.redirect('/login');
-        }
-
-        // Dohvati sve listiće prijavljenog korisnika
-        const tickets = await prisma.ticket.findMany({
-            where: { userSub: user.sub },
-            orderBy: { createdAt: 'desc' },
-            include: { round: true },
-        });
-
-        // Ako korisnik nema nijedan listić
-        if (!tickets || tickets.length === 0) {
-            return res.render('message', {
-                title: 'Nema listića',
-                message: 'Još niste uplatili nijedan listić.',
-                user,
-            });
-        }
-
-        // Inače prikaži popis listića
-        return res.render('myTickets', { user, tickets });
-
-    } catch (error) {
-        console.error('Greška kod /my-tickets:', error);
-        return res.status(500).render('message', {
-            title: 'Greška',
-            message: 'Došlo je do pogreške pri dohvaćanju vaših listića.',
-        });
+    const user = (req as any).oidc?.user;
+    if (!user) {
+        return res.redirect('/login');
     }
+
+    const tickets = await prisma.ticket.findMany({
+        where: { userSub: user.sub },
+        orderBy: { createdAt: 'desc' },
+        include: { round: true }
+    });
+
+    res.render('myTickets', { user, tickets });
 });
 
 /**
