@@ -6,8 +6,12 @@ const client = jwksClient({
     jwksUri: process.env.AUTH0_JWKS_URI!,
 });
 
-function getKey(header: JwtHeader, callback: (err: Error | null, key?: string) => void) {
-    client.getSigningKey(header.kid!, (err: Error | null, key: SigningKey | undefined) => {
+// ✅ eksplicitno tipizirani parametri
+function getKey(
+    header: JwtHeader,
+    callback: (err: Error | null, key?: string) => void
+): void {
+    client.getSigningKey(header.kid as string, (err: Error | null, key?: SigningKey) => {
         if (err) {
             return callback(err);
         }
@@ -16,10 +20,11 @@ function getKey(header: JwtHeader, callback: (err: Error | null, key?: string) =
     });
 }
 
-export const verifyM2M = (req: Request, res: Response, next: NextFunction) => {
+export const verifyM2M = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-        return res.status(401).json({ error: 'Token nije poslan' });
+        res.status(401).json({ error: 'Token nije poslan' });
+        return;
     }
 
     const token = authHeader.split(' ')[1];
@@ -34,8 +39,10 @@ export const verifyM2M = (req: Request, res: Response, next: NextFunction) => {
         (err, decoded) => {
             if (err) {
                 console.error('❌ Token nije valjan:', err.message);
-                return res.status(403).json({ error: 'Token nije valjan', details: err.message });
+                res.status(403).json({ error: 'Token nije valjan', details: err.message });
+                return;
             }
+
             (req as any).auth = decoded;
             next();
         }
