@@ -40,7 +40,7 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    res.oidc.logout({ returnTo: process.env.BASE_URL || `http://localhost:${PORT}` });
+    res.oidc.logout({ returnTo: process.env.BASE_URL});
 });
 
 // Admin (M2M-protected) endpoints
