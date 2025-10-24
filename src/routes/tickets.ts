@@ -35,11 +35,11 @@ router.post('/submit', async (req, res) => {
         validateIdNumber(idNumber);
         const nums = parseNumbers(numbers);
 
-        // Provjera aktivnog kola
         const round = await prisma.round.findFirst({
             where: { status: 'OPEN' },
             orderBy: { createdAt: 'desc' }
         });
+
         if (!round) {
             return res.status(400).render('message', {
                 title: 'Uplate onemogućene',
@@ -49,13 +49,12 @@ router.post('/submit', async (req, res) => {
 
         const user = (req as any).oidc?.user;
 
-        // Spremi listić u bazu s korisnikovim ID-em
         const ticket = await prisma.ticket.create({
             data: {
                 roundId: round.id,
                 idNumber: idNumber.trim(),
                 numbers: nums.join(','),
-                userSub: user?.sub || null 
+                userSub: user?.sub || null
             }
         });
 
@@ -94,9 +93,7 @@ router.get('/ticket/:id', async (req, res) => {
     }
 
     const numbers = ticket.numbers.split(',').map(n => Number(n));
-    const draw = ticket.round.draw
-        ? ticket.round.draw.numbers.split(',').map(n => Number(n))
-        : null;
+    const draw = ticket.round.draw ? ticket.round.draw.numbers.split(',').map(n => Number(n)) : null;
 
     res.render('ticket', {
         ticket,
@@ -124,9 +121,48 @@ router.get('/my-tickets', async (req, res) => {
 
     res.render('myTickets', { user, tickets });
 });
+
+/**
+ * POST /new-round
+ * Otvara novo kolo (bez autentikacije, za Render test)
+ */
+router.post('/new-round', async (req, res) => {
+    try {
+        await prisma.round.updateMany({ where: { status: 'OPEN' }, data: { status: 'CLOSED' } });
+        await prisma.round.create({ data: { status: 'OPEN' } });
+        console.log('🟢 Novo kolo aktivirano');
+        res.status(204).send();
+    } catch (err) {
+        console.error('❌ Greška kod otvaranja kola:', err);
+        res.status(500).json({ error: 'Greška na serveru.' });
+    }
+});
+
+/**
+ * POST /close
+ * Zatvara trenutno aktivno kolo (bez autentikacije)
+ */
+router.post('/close', async (req, res) => {
+    try {
+        const round = await prisma.round.findFirst({ where: { status: 'OPEN' }, orderBy: { createdAt: 'desc' } });
+
+        if (!round) {
+            console.log('ℹ️ Nema aktivnog kola za zatvaranje');
+            return res.status(204).send();
+        }
+
+        await prisma.round.update({ where: { id: round.id }, data: { status: 'CLOSED' } });
+        console.log(`🔴 Kolo ${round.id} zatvoreno`);
+        res.status(204).send();
+    } catch (err) {
+        console.error('❌ Greška kod zatvaranja kola:', err);
+        res.status(500).json({ error: 'Greška na serveru.' });
+    }
+});
+
 /**
  * POST /store-results
- * Spremanje izvučenih brojeva za trenutno zatvoreno kolo
+ * Spremanje izvučenih brojeva za zatvoreno kolo
  */
 router.post('/store-results', async (req, res) => {
     try {
@@ -136,7 +172,6 @@ router.post('/store-results', async (req, res) => {
             return res.status(400).json({ error: 'Neispravan format — očekuje se JSON polje brojeva.' });
         }
 
-        // Nađi trenutno zatvoreno kolo
         const round = await prisma.round.findFirst({
             where: { status: 'CLOSED' },
             orderBy: { createdAt: 'desc' }
@@ -146,16 +181,11 @@ router.post('/store-results', async (req, res) => {
             return res.status(400).json({ error: 'Nema zatvorenog kola za pohranu rezultata.' });
         }
 
-        // Provjeri postoji li već draw za to kolo
-        const existingDraw = await prisma.draw.findFirst({
-            where: { roundId: round.id }
-        });
-
+        const existingDraw = await prisma.draw.findFirst({ where: { roundId: round.id } });
         if (existingDraw) {
             return res.status(400).json({ error: 'Rezultati su već pohranjeni za ovo kolo.' });
         }
 
-        // Spremi rezultate u bazu
         await prisma.draw.create({
             data: {
                 roundId: round.id,
