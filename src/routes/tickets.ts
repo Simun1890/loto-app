@@ -54,11 +54,10 @@ router.post('/submit', async (req, res) => {
                 roundId: round.id,
                 idNumber: idNumber.trim(),
                 numbers: nums.join(','),
-                userSub: user?.sub || null
             }
         });
 
-        const base = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+        const base = process.env.BASE_URL;
         const link = `${base}/ticket/${ticket.id}`;
         const png = await generatePngQr(link);
 
