@@ -22,7 +22,6 @@ model Ticket {
   round     Round    @relation(fields: [roundId], references: [id])
   idNumber  String   @db.VarChar(20)
   numbers   String   // comma-separated numbers (sorted)
-  userSub	String? 
 }
 
 model Draw {

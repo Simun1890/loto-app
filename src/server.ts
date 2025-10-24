@@ -27,11 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // views
-const viewsPath = fs.existsSync(path.join(__dirname, 'views'))
-    ? path.join(__dirname, 'views')
-    : path.join(__dirname, '..', 'src', 'views');
-
-app.set('views', viewsPath);
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // static

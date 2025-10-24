@@ -103,24 +103,6 @@ router.get('/ticket/:id', async (req, res) => {
     });
 });
 
-/**
- * GET /my-tickets
- * Pregled listića prijavljenog korisnika
- */
-router.get('/my-tickets', async (req, res) => {
-    const user = (req as any).oidc?.user;
-    if (!user) {
-        return res.redirect('/login');
-    }
-
-    const tickets = await prisma.ticket.findMany({
-        where: { userSub: user.sub },
-        orderBy: { createdAt: 'desc' },
-        include: { round: true }
-    });
-
-    res.render('myTickets', { user, tickets });
-});
 
 /**
  * POST /new-round
