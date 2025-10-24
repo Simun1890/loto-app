@@ -10,6 +10,7 @@ import adminRoutes from './routes/admin.js';
 import ticketsRoutes from './routes/tickets.js';
 import { oidc } from './routes/auth.js';
 import * as openid from 'express-openid-connect';
+import fs from 'fs';
 const { requiresAuth } = openid;
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,7 +27,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 // views
-app.set('views', path.join(__dirname, 'views'));
+const viewsPath = fs.existsSync(path.join(__dirname, 'views'))
+    ? path.join(__dirname, 'views')
+    : path.join(__dirname, '..', 'src', 'views');
+
+app.set('views', viewsPath);
 app.set('view engine', 'ejs');
 
 // static
