@@ -46,8 +46,10 @@
             <% } else { %>
               <p>Broj listića u trenutnom kolu: <strong><%= ticketCount %></strong></p>
             <% } %>
-            <% if (currentRound && currentRound.status === 'OPEN') { %>
-              <a class="btn btn-primary" href="/submit">Uplati listić</a>
+            <% if (user) { %>
+              <a href="/submit" class="btn btn-primary">Uplati listić</a>
+            <% } else { %>
+              <p>Za uplatu listića potrebno je <a href="/login">prijaviti se</a>.</p>
             <% } %>
           </div>
         </div>
