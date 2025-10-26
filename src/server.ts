@@ -19,24 +19,19 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
 
-// security & parsing
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// views
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// static
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// ✅ Auth0 middleware mora biti prije svih ruta
 app.use(oidc);
 
-// Simple /login route
 app.get('/login', (req, res) => {
     res.oidc.login({ returnTo: '/' });
 });
@@ -45,11 +40,9 @@ app.get('/logout', (req, res) => {
     res.oidc.logout({ returnTo: process.env.BASE_URL});
 });
 
-// Admin (M2M-protected) endpoints
 app.use('/', adminRoutes);
 app.use('/', ticketsRoutes);
 
-// Home page
 app.get('/', async (req, res) => {
     const currentRound = await prisma.round.findFirst({
         orderBy: { createdAt: 'desc' },
@@ -67,7 +60,6 @@ app.get('/', async (req, res) => {
     });
 });
 
-// 404 fallback
 app.use((req, res) => res.status(404).render('message', { title: '404', message: 'Stranica nije pronađena.' }));
 
 app.listen(PORT, () => {

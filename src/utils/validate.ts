@@ -10,10 +10,8 @@ export function parseNumbers(input: string): number[] {
     if (n < 1 || n > 45) throw new Error("Svi brojevi moraju biti u rasponu 1–45.");
     return n;
   });
-  // check duplicates
   const set = new Set(nums);
   if (set.size !== nums.length) throw new Error("Nisu dopušteni duplikati među brojevima.");
-  // sort asc and return
   return Array.from(set).sort((a,b)=>a-b);
 }
 

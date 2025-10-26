@@ -26,7 +26,6 @@ export function requireM2M(req: Request, res: Response, next: NextFunction) {
     algorithms: ['RS256']
   }, (err, decoded) => {
     if (err) return res.status(401).json({ error: "Invalid token" });
-    // Optionally check scopes if needed
     (req as any).auth = decoded;
     next();
   });

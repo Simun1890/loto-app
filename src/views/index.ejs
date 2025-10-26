@@ -47,7 +47,11 @@
               <p>Broj listića u trenutnom kolu: <strong><%= ticketCount %></strong></p>
             <% } %>
             <% if (user) { %>
-              <a href="/submit" class="btn btn-primary">Uplati listić</a>
+              <% if (currentRound && currentRound.status === 'OPEN') { %>
+                <a href="/submit" class="btn btn-primary">Uplati listić</a>
+              <% } else { %>
+                <p class="text-muted">Uplate trenutno nisu omogućene.</p>
+              <% } %>
             <% } else { %>
               <p>Za uplatu listića potrebno je <a href="/login">prijaviti se</a>.</p>
             <% } %>

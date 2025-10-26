@@ -5,10 +5,6 @@ import { generatePngQr } from '../utils/qr.js';
 
 const router = Router();
 
-/**
- * GET /submit
- * Prikaz forme za uplatu listića (samo ako je aktivno kolo)
- */
 router.get('/submit', async (req, res) => {
     const round = await prisma.round.findFirst({
         where: { status: 'OPEN' },
@@ -25,10 +21,6 @@ router.get('/submit', async (req, res) => {
     res.render('submit', { user: (req as any).oidc?.user || null });
 });
 
-/**
- * POST /submit
- * Uplata novog listića → vraća QR kod (PNG)
- */
 router.post('/submit', async (req, res) => {
     try {
         const { idNumber, numbers } = req.body || {};
@@ -72,10 +64,6 @@ router.post('/submit', async (req, res) => {
     }
 });
 
-/**
- * GET /ticket/:id
- * Javni prikaz jednog listića
- */
 router.get('/ticket/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -103,10 +91,6 @@ router.get('/ticket/:id', async (req, res) => {
 });
 
 
-/**
- * POST /new-round
- * Otvara novo kolo (bez autentikacije, za Render test)
- */
 router.post('/new-round', async (req, res) => {
     try {
         await prisma.round.updateMany({ where: { status: 'OPEN' }, data: { status: 'CLOSED' } });
@@ -119,10 +103,6 @@ router.post('/new-round', async (req, res) => {
     }
 });
 
-/**
- * POST /close
- * Zatvara trenutno aktivno kolo (bez autentikacije)
- */
 router.post('/close', async (req, res) => {
     try {
         const round = await prisma.round.findFirst({ where: { status: 'OPEN' }, orderBy: { createdAt: 'desc' } });
@@ -141,10 +121,6 @@ router.post('/close', async (req, res) => {
     }
 });
 
-/**
- * POST /store-results
- * Spremanje izvučenih brojeva za zatvoreno kolo
- */
 router.post('/store-results', async (req, res) => {
     try {
         const { numbers } = req.body || {};

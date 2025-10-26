@@ -4,13 +4,11 @@ import { verifyM2M } from '../utils/verifyM2M.js';
 
 const router = Router();
 
-// ✅ Aktiviraj novo kolo
 router.post('/new-round', verifyM2M, async (req, res) => {
     await prisma.round.create({ data: { status: 'OPEN' } });
     return res.status(204).send();
 });
 
-// ✅ Zatvori trenutno kolo
 router.post('/close', verifyM2M, async (req, res) => {
     const current = await prisma.round.findFirst({ where: { status: 'OPEN' }, orderBy: { createdAt: 'desc' } });
     if (!current) return res.status(400).json({ error: 'Nema aktivnog kola' });
@@ -18,7 +16,6 @@ router.post('/close', verifyM2M, async (req, res) => {
     return res.status(204).send();
 });
 
-// ✅ Pohrani rezultate
 router.post('/store-results', verifyM2M, async (req, res) => {
     const { numbers } = req.body;
     if (!Array.isArray(numbers)) return res.status(400).json({ error: 'Očekuje se polje brojeva' });
